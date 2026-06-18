@@ -275,6 +275,7 @@ function renderQuestion() {
   els.modeButtons.forEach((button) => {
     const isVisitorHidden = currentRole === "visitor" && button.dataset.mode === "scenarios";
     button.hidden = isVisitorHidden;
+    button.style.display = isVisitorHidden ? "none" : "";
     button.classList.toggle("active", button.dataset.mode === state.mode);
   });
   renderCampaign();
