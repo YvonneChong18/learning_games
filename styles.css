@@ -58,6 +58,10 @@ body::before {
   display: none;
 }
 
+.visitor-mode [data-mode="scenarios"] {
+  display: none;
+}
+
 .login-screen {
   display: none;
   min-height: 100vh;

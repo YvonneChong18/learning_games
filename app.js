@@ -419,6 +419,7 @@ function clearAutoNext() {
 function initAuth() {
   if (sessionStorage.getItem("qaArcadeAuth") === "yes") {
     currentRole = sessionStorage.getItem("qaArcadeRole") || "visitor";
+    applyRoleClass();
     unlockApp();
   }
 
@@ -433,6 +434,7 @@ function initAuth() {
       sessionStorage.setItem("qaArcadeAuth", "yes");
       sessionStorage.setItem("qaArcadeRole", account.role);
       currentRole = account.role;
+      applyRoleClass();
       els.loginError.textContent = "";
       unlockApp();
       normalizeVisitorState();
@@ -449,6 +451,7 @@ function initAuth() {
     sessionStorage.removeItem("qaArcadeAuth");
     sessionStorage.removeItem("qaArcadeRole");
     currentRole = "visitor";
+    applyRoleClass();
     document.body.classList.add("auth-locked");
     els.passwordInput.value = "";
     els.usernameInput.focus();
@@ -456,7 +459,13 @@ function initAuth() {
 }
 
 function unlockApp() {
+  applyRoleClass();
   document.body.classList.remove("auth-locked");
+}
+
+function applyRoleClass() {
+  document.body.classList.toggle("visitor-mode", currentRole === "visitor");
+  document.body.classList.toggle("owner-mode", currentRole === "owner");
 }
 
 function activeLaneOrder() {
