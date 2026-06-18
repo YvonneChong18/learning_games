@@ -7,8 +7,8 @@ const lanes = {
 
 const laneOrder = Object.keys(lanes);
 const authCredentials = [
-  { username: "yvonne", password: "Learning777", role: "owner" },
-  { username: "visitor", password: "visitor111", role: "visitor" }
+  { username: "yvonne", password: "Learning777", role: "owner", storageUser: "yvonne" },
+  { username: "visitor", password: "visitor111", role: "visitor", storageUser: "visitor" }
 ];
 
 const stages = [
@@ -74,31 +74,116 @@ const stages = [
     title: "Week 5: Pytest API Automation",
     theme: "Convert API scenarios into code tests.",
     daily: "Create tests for GET, POST, PUT/PATCH, DELETE, and invalid input.",
-    questions: laneSet("Pytest", "def test_login_success():\n    assert response.status_code == 200", "Pytest plus requests is a practical API automation stack.")
+    questions: {
+      methods: [
+        q("Pytest", "Which file name will pytest discover automatically?", "Project: api-tests/", "test_login.py", [["login_check.py", "May not be auto-discovered."], ["test_login.py", "Pytest discovers files beginning with test_."], ["login.manual", "Not a Python test file."], ["README.md", "Documentation, not tests."]], "Pytest auto-discovers files named test_*.py or *_test.py."),
+        q("Fixture", "What is the main purpose of a pytest fixture?", "@pytest.fixture\ndef token(): ...", "Share setup data across tests", [["Share setup data across tests", "Correct."], ["Delete all assertions", "No."], ["Only format reports", "No."], ["Replace GitHub Actions", "No."]], "Fixtures keep setup reusable, such as base URLs, tokens, and test data.")
+      ],
+      statuses: [
+        q("Assertion", "Which assertion checks a successful API response in Python?", "response = requests.get(url)", "assert response.status_code == 200", [["assert response.status_code == 200", "Correct."], ["print(response)", "Only prints."], ["response.status_code = 200", "Assigns instead of checks."], ["return 200", "Does not validate response."]], "A pytest test should assert the API result explicitly."),
+        q("Data", "Where should repeated test input usually live?", "email, password, payloads", "Test data file or fixture", [["Only inside every test", "Creates duplication."], ["Test data file or fixture", "Reusable and clearer."], ["Browser history", "Not stable."], ["Screenshot name", "Not data storage."]], "Shared data belongs in fixtures, JSON files, or helper modules.")
+      ],
+      response: [
+        q("JSON", "Which code reads JSON response body with requests?", "response = requests.post(url, json=payload)", "body = response.json()", [["body = response.json()", "Correct."], ["body = response.text()", "Text only; sometimes useful but not parsed."], ["body = response.html()", "Not a requests method."], ["body = request.json()", "Wrong object."]], "response.json() parses the response body so fields can be asserted."),
+        q("Negative", "What should an invalid-login pytest check include?", "Wrong password", "Status code and error message", [["Only print the response", "No assertion."], ["Status code and error message", "Correct."], ["Token must exist", "Wrong for invalid login."], ["Skip the test", "No."]], "Negative tests should verify both failure status and clear error output.")
+      ],
+      scenarios: [
+        q("Structure", "Which folder layout is easiest to maintain?", "API framework", "tests/, data/, utils/, config/", [["Everything in one file", "Gets messy."], ["tests/, data/, utils/, config/", "Clean structure."], ["Only screenshots/", "Missing tests."], ["Random folders", "Hard to understand."]], "A clear framework structure makes your automation easier to explain and maintain."),
+        q("Command", "Which command runs pytest quietly with short output?", "Terminal", "pytest -q", [["pytest -q", "Correct."], ["python readme.md", "No."], ["git push", "Publishes code, does not run tests."], ["newman run", "For Postman collections."]], "pytest -q runs the suite with compact output.")
+      ]
+    }
   },
   {
     title: "Week 6: AI-Assisted QA",
     theme: "Use AI agents to generate, refactor, and debug tests responsibly.",
     daily: "Keep an AI_WORKFLOW.md with prompts, review notes, and final decisions.",
-    questions: laneSet("AI Workflow", "Prompt -> review -> edit -> run -> verify", "AI can accelerate test work, but you own the assertions and quality decisions.")
+    questions: {
+      methods: [
+        q("AI Workflow", "What is the safest AI-assisted testing workflow?", "Prompt -> ?", "Prompt, review, edit, run, verify", [["Prompt, copy, never check", "Risky."], ["Prompt, review, edit, run, verify", "Correct."], ["Ask AI to hide failures", "No."], ["Skip assertions", "No."]], "AI can help draft tests, but you still verify logic and results."),
+        q("Prompt", "Which prompt is more useful?", "Need login API tests", "Generate positive and negative login API test cases with expected status codes", [["Make tests", "Too vague."], ["Generate positive and negative login API test cases with expected status codes", "Specific."], ["Do everything", "Too broad."], ["Ignore errors", "Bad testing."]], "Specific prompts produce better test ideas.")
+      ],
+      statuses: [
+        q("Review", "AI generated a test with no assertion. What should you do?", "def test_login(): requests.post(...)", "Add meaningful assertions before accepting it", [["Accept it", "No."], ["Add meaningful assertions before accepting it", "Correct."], ["Delete the whole project", "Too much."], ["Only rename it", "Does not fix quality."]], "A test without assertions is weak automation."),
+        q("Debug", "AI suggests changing expected 400 to 200 to pass. What is the right move?", "Failing negative test", "Check requirements and keep the correct expected behavior", [["Change to 200 blindly", "Wrong."], ["Check requirements and keep the correct expected behavior", "Correct."], ["Remove the test", "No."], ["Ignore all failures", "No."]], "Passing is not the goal; correct validation is the goal.")
+      ],
+      response: [
+        q("Documentation", "What belongs in AI_WORKFLOW.md?", "Project notes", "Prompts used, changes reviewed, and final validation", [["Private passwords", "Never."], ["Prompts used, changes reviewed, and final validation", "Correct."], ["Only jokes", "Not useful."], ["Nothing", "No record."]], "Documenting AI usage shows responsibility and review."),
+        q("Coverage", "How can AI help improve coverage?", "Existing tests only cover success", "Suggest missing negative and edge cases", [["Suggest missing negative and edge cases", "Correct."], ["Remove edge cases", "No."], ["Hide skipped tests", "No."], ["Delete reports", "No."]], "AI is useful for brainstorming missed scenarios.")
+      ],
+      scenarios: [
+        q("Ownership", "Who owns the final test quality?", "AI-assisted project", "The tester", [["The tester", "Correct."], ["The AI tool only", "No."], ["Nobody", "No."], ["The browser", "No."]], "You can use AI, but you own the decisions and quality."),
+        q("Refactor", "AI finds duplicated login code. What is a good improvement?", "Repeated login steps", "Move login setup into a helper or fixture", [["Copy more code", "No."], ["Move login setup into a helper or fixture", "Correct."], ["Remove login tests", "No."], ["Rename variables only", "Too small."]], "Refactoring duplication makes tests easier to maintain.")
+      ]
+    }
   },
   {
     title: "Week 7: Playwright UI",
     theme: "Browser automation, locators, actions, and assertions.",
     daily: "Automate login success, login failure, and one form workflow.",
-    questions: laneSet("Playwright", "await expect(page.getByText('Products')).toBeVisible()", "UI automation should use stable locators and clear assertions.")
+    questions: {
+      methods: [
+        q("Locator", "Which locator is usually more stable?", "<button data-testid='login-button'>Login</button>", "page.getByTestId('login-button')", [["page.locator('div > div > button')", "Too brittle."], ["page.getByTestId('login-button')", "Correct."], ["page.locator('*')", "Too broad."], ["page.getByText('')", "Empty text is weak."]], "Stable test IDs are less likely to break when layout changes."),
+        q("Action", "What should happen after clicking Login in a UI test?", "await page.getByText('Login').click()", "Assert the expected page or message appears", [["Close browser immediately", "No validation."], ["Assert the expected page or message appears", "Correct."], ["Wait forever", "No."], ["Only print done", "Weak."]], "Every UI flow needs an assertion after the action.")
+      ],
+      statuses: [
+        q("Wait", "What is better than a fixed 10-second sleep?", "Loading dashboard", "Wait for a specific element to appear", [["Wait for a specific element to appear", "Correct."], ["Always sleep 10 seconds", "Slow and flaky."], ["Never wait", "Often flaky."], ["Reload randomly", "No."]], "Specific waits make UI tests faster and more reliable."),
+        q("Failure", "What artifact helps debug a failed UI test?", "CI failure", "Screenshot or trace", [["Screenshot or trace", "Correct."], ["Only a pass badge", "Not enough."], ["Delete logs", "No."], ["Random comment", "No."]], "Screenshots/traces help explain what the browser saw.")
+      ],
+      response: [
+        q("Assertion", "Which Playwright assertion checks a visible page title?", "<h1>Products</h1>", "await expect(page.getByRole('heading', { name: 'Products' })).toBeVisible()", [["await expect(page).toBeHidden()", "Wrong target."], ["await expect(page.getByRole('heading', { name: 'Products' })).toBeVisible()", "Correct."], ["console.log('Products')", "No assertion."], ["await page.close()", "No validation."]], "Role-based locators can be readable and accessible."),
+        q("Negative UI", "For invalid login, what should the UI test verify?", "Wrong password", "Error message is visible", [["User reaches dashboard", "Wrong."], ["Error message is visible", "Correct."], ["Cart opens", "Unrelated."], ["No assertion", "Weak."]], "Negative UI tests should verify the user sees the proper error.")
+      ],
+      scenarios: [
+        q("Flow", "Which flow is a good first Playwright project?", "Demo shop", "Login, add item, checkout validation", [["Login, add item, checkout validation", "Good end-to-end flow."], ["Only open homepage", "Too shallow."], ["Random clicks", "No clear purpose."], ["No assertions", "Not testing."]], "A real workflow makes UI automation more meaningful."),
+        q("Maintenance", "Why use Page Object Model?", "Many tests use same login page", "Keep selectors and page actions reusable", [["Keep selectors and page actions reusable", "Correct."], ["Make tests impossible to read", "No."], ["Remove all assertions", "No."], ["Avoid Git", "No."]], "Page objects reduce duplicated selectors and actions.")
+      ]
+    }
   },
   {
     title: "Week 8: Framework Structure",
     theme: "Page objects, fixtures, config, test data, and reports.",
     daily: "Refactor repeated steps into helpers or page objects.",
-    questions: laneSet("Framework", "pages/ tests/ data/ utils/ config/", "A framework makes tests easier to maintain as the suite grows.")
+    questions: {
+      methods: [
+        q("Architecture", "Where should reusable API helper functions go?", "Framework folders", "utils/ or helpers/", [["utils/ or helpers/", "Correct."], ["screenshots/", "Artifacts only."], ["README only", "Documentation only."], ["Nowhere", "No."]], "Reusable helpers keep tests small and readable."),
+        q("Config", "What should a config file store?", "baseUrl, timeout, environment", "Environment settings", [["Environment settings", "Correct."], ["Every test assertion", "No."], ["Personal secrets in plain text", "Bad practice."], ["Screenshots only", "No."]], "Config keeps environment values separate from test logic.")
+      ],
+      statuses: [
+        q("Reports", "What makes a test report useful?", "After test run", "Pass/fail, error details, and artifacts", [["Pass/fail, error details, and artifacts", "Correct."], ["Only a blank page", "No."], ["Hidden failures", "No."], ["No timestamps", "Weak."]], "Reports should help you understand results quickly."),
+        q("Data", "Why separate test data from test logic?", "Many payloads", "Easier updates and data-driven tests", [["Easier updates and data-driven tests", "Correct."], ["Makes code longer for no reason", "Not the point."], ["Deletes validation", "No."], ["Blocks CI", "No."]], "Data separation helps scale test coverage.")
+      ],
+      response: [
+        q("Logging", "What should logs help answer?", "Failed test", "What happened before the failure", [["What happened before the failure", "Correct."], ["Nothing", "No."], ["Only the tester name", "Too little."], ["Hide errors", "No."]], "Good logs shorten debugging time."),
+        q("Naming", "Which test name is clearer?", "Login tests", "test_login_fails_with_wrong_password", [["test1", "Too vague."], ["abc", "Meaningless."], ["test_login_fails_with_wrong_password", "Clear."], ["final_final_test", "No."]], "Clear names explain behavior before you open the test.")
+      ],
+      scenarios: [
+        q("Refactor", "Two tests repeat the same setup. What should you do?", "Repeated setup", "Create a fixture or helper", [["Create a fixture or helper", "Correct."], ["Copy it five more times", "No."], ["Delete assertions", "No."], ["Rename the folder only", "No."]], "Framework quality improves when duplication is reduced."),
+        q("Readme", "What should the framework README include?", "New user wants to run tests", "Setup, run commands, structure, and reports", [["Setup, run commands, structure, and reports", "Correct."], ["Only screenshots", "Not enough."], ["No commands", "Hard to use."], ["Private tokens", "Never."]], "A good README makes your project easy to evaluate.")
+      ]
+    }
   },
   {
     title: "Week 9: GitHub Actions",
     theme: "Run tests automatically on push and save artifacts.",
     daily: "Add a workflow file and upload the test report as an artifact.",
-    questions: laneSet("CI/CD", "on: [push]\njobs:\n  test:\n    runs-on: ubuntu-latest", "CI proves your tests run repeatably, not only on your machine.")
+    questions: {
+      methods: [
+        q("Workflow", "Where does a GitHub Actions workflow file live?", "Repository", ".github/workflows/tests.yml", [[".github/workflows/tests.yml", "Correct."], ["Desktop only", "No."], ["screenshots/tests.yml", "No."], ["README title", "No."]], "GitHub Actions reads workflow YAML files from .github/workflows."),
+        q("Trigger", "What does on: [push] mean?", "workflow.yml", "Run workflow when code is pushed", [["Run workflow when code is pushed", "Correct."], ["Delete branch", "No."], ["Disable tests", "No."], ["Open Postman UI", "No."]], "A push trigger runs CI after repository updates.")
+      ],
+      statuses: [
+        q("Runner", "Which runner is common for basic test automation?", "runs-on: ?", "ubuntu-latest", [["ubuntu-latest", "Correct."], ["my phone", "No."], ["README.md", "No."], ["localhost only", "Not a runner."]], "ubuntu-latest is a common GitHub-hosted runner."),
+        q("Artifacts", "Why upload test reports as artifacts?", "CI run", "So reports can be downloaded after the run", [["So reports can be downloaded after the run", "Correct."], ["To hide results", "No."], ["To stop tests", "No."], ["To remove logs", "No."]], "Artifacts preserve useful output from CI.")
+      ],
+      response: [
+        q("Failure", "If CI fails but local passes, what should you check first?", "Different environments", "Dependencies, env vars, and paths", [["Dependencies, env vars, and paths", "Correct."], ["Ignore CI forever", "No."], ["Delete workflow", "No."], ["Change all asserts to pass", "No."]], "CI failures often reveal setup differences."),
+        q("Badge", "Why add a CI badge to README?", "Project page", "Shows current test status quickly", [["Shows current test status quickly", "Correct."], ["Stores passwords", "No."], ["Runs tests locally", "No."], ["Replaces reports", "No."]], "Badges give quick visibility into build health.")
+      ],
+      scenarios: [
+        q("Pipeline", "Best CI pipeline order for API tests?", "GitHub Actions", "Checkout code, install dependencies, run tests, upload report", [["Checkout code, install dependencies, run tests, upload report", "Correct."], ["Upload report before tests", "Wrong order."], ["Run nothing", "No."], ["Delete repository", "No."]], "A CI job should set up the project before executing tests."),
+        q("Secrets", "Where should private tokens be stored in GitHub?", "CI credentials", "GitHub Actions secrets", [["GitHub Actions secrets", "Correct."], ["Plain README", "Unsafe."], ["Commit history", "Unsafe."], ["Screenshot", "Unsafe."]], "Secrets should not be committed to the repository.")
+      ]
+    }
   },
   {
     title: "Week 10: Resume Boss Level",
@@ -109,17 +194,18 @@ const stages = [
 ];
 
 const state = {
-  stage: Number(localStorage.getItem("qaArcadeStage") || 0),
-  mode: localStorage.getItem("qaArcadeMode") || "methods",
-  indexByStageMode: JSON.parse(localStorage.getItem("qaArcadeIndex") || "{}"),
-  xp: Number(localStorage.getItem("qaArcadeXp") || 0),
-  streak: Number(localStorage.getItem("qaArcadeStreak") || 0),
-  completed: JSON.parse(localStorage.getItem("qaArcadeCompleted") || "{}"),
+  stage: 0,
+  mode: "methods",
+  indexByStageMode: {},
+  xp: 0,
+  streak: 0,
+  completed: {},
   answered: false,
   autoNextTimer: null
 };
 
 let currentRole = sessionStorage.getItem("qaArcadeRole") || "visitor";
+let currentUser = sessionStorage.getItem("qaArcadeUser") || "visitor";
 
 const els = {
   campaignLabel: document.querySelector("#campaignLabel"),
@@ -196,12 +282,73 @@ function currentQuestion() {
 }
 
 function persist() {
-  localStorage.setItem("qaArcadeStage", String(state.stage));
-  localStorage.setItem("qaArcadeMode", state.mode);
-  localStorage.setItem("qaArcadeIndex", JSON.stringify(state.indexByStageMode));
-  localStorage.setItem("qaArcadeXp", String(state.xp));
-  localStorage.setItem("qaArcadeStreak", String(state.streak));
-  localStorage.setItem("qaArcadeCompleted", JSON.stringify(state.completed));
+  localStorage.setItem(progressKey(), JSON.stringify({
+    stage: state.stage,
+    mode: state.mode,
+    indexByStageMode: state.indexByStageMode,
+    xp: state.xp,
+    streak: state.streak,
+    completed: state.completed
+  }));
+}
+
+function progressKey(user = currentUser) {
+  return `qaArcadeProgress:${user}`;
+}
+
+function defaultProgress() {
+  return {
+    stage: 0,
+    mode: "methods",
+    indexByStageMode: {},
+    xp: 0,
+    streak: 0,
+    completed: {}
+  };
+}
+
+function loadProgress() {
+  migrateLegacyProgress();
+  const saved = readProgress(progressKey());
+  const progress = saved || defaultProgress();
+  state.stage = Number(progress.stage || 0);
+  state.mode = progress.mode || "methods";
+  state.indexByStageMode = progress.indexByStageMode || {};
+  state.xp = Number(progress.xp || 0);
+  state.streak = Number(progress.streak || 0);
+  state.completed = progress.completed || {};
+  normalizeVisitorState();
+}
+
+function readProgress(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function migrateLegacyProgress() {
+  if (localStorage.getItem(progressKey("yvonne"))) return;
+  if (!localStorage.getItem("qaArcadeStage") && !localStorage.getItem("qaArcadeCompleted")) return;
+
+  localStorage.setItem(progressKey("yvonne"), JSON.stringify({
+    stage: Number(localStorage.getItem("qaArcadeStage") || 0),
+    mode: localStorage.getItem("qaArcadeMode") || "methods",
+    indexByStageMode: readLegacyJson("qaArcadeIndex"),
+    xp: Number(localStorage.getItem("qaArcadeXp") || 0),
+    streak: Number(localStorage.getItem("qaArcadeStreak") || 0),
+    completed: readLegacyJson("qaArcadeCompleted")
+  }));
+}
+
+function readLegacyJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "{}");
+  } catch {
+    return {};
+  }
 }
 
 function updateScoreboard() {
@@ -308,7 +455,7 @@ function answerQuestion(event) {
     });
     state.autoNextTimer = window.setTimeout(() => {
       advanceAfterCorrect();
-    }, 950);
+    }, 10000);
   } else {
     state.streak = 0;
     button.classList.add("wrong");
@@ -420,6 +567,8 @@ function clearAutoNext() {
 function initAuth() {
   if (sessionStorage.getItem("qaArcadeAuth") === "yes") {
     currentRole = sessionStorage.getItem("qaArcadeRole") || "visitor";
+    currentUser = sessionStorage.getItem("qaArcadeUser") || "visitor";
+    loadProgress();
     applyRoleClass();
     unlockApp();
   }
@@ -434,7 +583,10 @@ function initAuth() {
     if (account) {
       sessionStorage.setItem("qaArcadeAuth", "yes");
       sessionStorage.setItem("qaArcadeRole", account.role);
+      sessionStorage.setItem("qaArcadeUser", account.storageUser);
       currentRole = account.role;
+      currentUser = account.storageUser;
+      loadProgress();
       applyRoleClass();
       els.loginError.textContent = "";
       unlockApp();
@@ -451,7 +603,10 @@ function initAuth() {
   els.logout.addEventListener("click", () => {
     sessionStorage.removeItem("qaArcadeAuth");
     sessionStorage.removeItem("qaArcadeRole");
+    sessionStorage.removeItem("qaArcadeUser");
     currentRole = "visitor";
+    currentUser = "visitor";
+    loadProgress();
     applyRoleClass();
     document.body.classList.add("auth-locked");
     els.passwordInput.value = "";
