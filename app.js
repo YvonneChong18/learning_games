@@ -455,7 +455,7 @@ function answerQuestion(event) {
     });
     state.autoNextTimer = window.setTimeout(() => {
       advanceAfterCorrect();
-    }, 10000);
+    }, 5000);
   } else {
     state.streak = 0;
     button.classList.add("wrong");
