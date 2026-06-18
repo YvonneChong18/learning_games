@@ -6,10 +6,10 @@ const lanes = {
 };
 
 const laneOrder = Object.keys(lanes);
-const authCredentials = {
-  username: "yvonne",
-  password: "Learning777"
-};
+const authCredentials = [
+  { username: "yvonne", password: "Learning777", role: "owner" },
+  { username: "visitor", password: "visitor111", role: "visitor" }
+];
 
 const stages = [
   {
@@ -119,6 +119,8 @@ const state = {
   autoNextTimer: null
 };
 
+let currentRole = sessionStorage.getItem("qaArcadeRole") || "visitor";
+
 const els = {
   campaignLabel: document.querySelector("#campaignLabel"),
   campaignList: document.querySelector("#campaignList"),
@@ -174,11 +176,11 @@ function stageKey(stageIndex, mode) {
 }
 
 function stageScore(stageIndex) {
-  return Object.keys(lanes).reduce((sum, mode) => sum + (state.completed[stageKey(stageIndex, mode)] || 0), 0);
+  return activeLaneOrder().reduce((sum, mode) => sum + (state.completed[stageKey(stageIndex, mode)] || 0), 0);
 }
 
 function stageTotal(stageIndex) {
-  return Object.keys(lanes).reduce((sum, mode) => sum + stages[stageIndex].questions[mode].length, 0);
+  return activeLaneOrder().reduce((sum, mode) => sum + stages[stageIndex].questions[mode].length, 0);
 }
 
 function isStageUnlocked(stageIndex) {
@@ -187,9 +189,10 @@ function isStageUnlocked(stageIndex) {
 }
 
 function currentQuestion() {
+  normalizeVisitorState();
   const key = stageKey(state.stage, state.mode);
   const questions = stages[state.stage].questions[state.mode];
-  return questions[(state.indexByStageMode[key] || 0) % questions.length];
+  return displayQuestion(questions[(state.indexByStageMode[key] || 0) % questions.length]);
 }
 
 function persist() {
@@ -210,11 +213,12 @@ function updateScoreboard() {
 
 function renderCampaign() {
   els.campaignList.innerHTML = stages.map((stage, index) => {
+    if (!isStageVisible(index)) return "";
     const unlocked = isStageUnlocked(index);
     const score = stageScore(index);
     const total = stageTotal(index);
     const progress = Math.round((score / total) * 100);
-    const title = stage.title.replace("Week ", "W");
+    const title = displayStageTitle(stage.title).replace("Week ", "W");
     return `
       <button class="campaign-button ${index === state.stage ? "active" : ""} ${unlocked ? "" : "locked"}" type="button" data-stage="${index}" ${unlocked ? "" : "aria-disabled=\"true\""}>
         <span class="campaign-head">
@@ -222,7 +226,7 @@ function renderCampaign() {
           <span class="campaign-stars">${unlocked ? `${score}/${total}` : "LOCK"}</span>
         </span>
         <span class="campaign-title">${escapeHtml(title)}</span>
-        <span class="campaign-theme">${escapeHtml(stage.theme)}</span>
+        <span class="campaign-theme">${escapeHtml(displayStageTheme(stage.theme))}</span>
         <span class="campaign-progress" aria-hidden="true"><span style="width: ${progress}%"></span></span>
       </button>
     `;
@@ -231,14 +235,14 @@ function renderCampaign() {
 
 function renderSkillTrack() {
   const stage = stages[state.stage];
-  els.skillTrack.innerHTML = Object.keys(lanes).map((mode) => {
+  els.skillTrack.innerHTML = activeLaneOrder().map((mode) => {
     const key = stageKey(state.stage, mode);
     const count = state.completed[key] || 0;
     const total = stage.questions[mode].length;
     return `
       <div class="skill-item ${count >= total ? "done" : ""}">
         <strong>${lanes[mode].title}</strong>
-        <span>${count}/${total} cleared. ${stage.theme}</span>
+        <span>${count}/${total} cleared. ${displayStageTheme(stage.theme)}</span>
       </div>
     `;
   }).join("");
@@ -246,17 +250,18 @@ function renderSkillTrack() {
 
 function renderQuestion() {
   clearAutoNext();
+  normalizeVisitorState();
   const stage = stages[state.stage];
   const question = currentQuestion();
   state.answered = false;
 
   els.campaignLabel.textContent = `Stage ${state.stage + 1}`;
-  els.modeEyebrow.textContent = stage.title;
+  els.modeEyebrow.textContent = displayStageTitle(stage.title);
   els.modeTitle.textContent = lanes[state.mode].title;
   els.missionType.textContent = question.type;
   els.questionText.textContent = question.question;
   els.payloadBlock.textContent = question.payload;
-  els.dailyPrompt.textContent = stage.daily;
+  els.dailyPrompt.textContent = displayDailyPrompt(stage.daily);
   els.feedback.className = "feedback";
   els.feedback.innerHTML = "<strong>Ready</strong><span>Pick the best answer to clear this gate.</span>";
 
@@ -267,7 +272,11 @@ function renderQuestion() {
     </button>
   `).join("");
 
-  els.modeButtons.forEach((button) => button.classList.toggle("active", button.dataset.mode === state.mode));
+  els.modeButtons.forEach((button) => {
+    const isVisitorHidden = currentRole === "visitor" && button.dataset.mode === "scenarios";
+    button.hidden = isVisitorHidden;
+    button.classList.toggle("active", button.dataset.mode === state.mode);
+  });
   renderCampaign();
   renderSkillTrack();
   updateScoreboard();
@@ -335,8 +344,8 @@ function advanceAfterCorrect() {
     return;
   }
 
-  const nextStage = state.stage + 1;
-  if (nextStage < stages.length && isStageUnlocked(nextStage)) {
+  const nextStage = nextVisibleStage(state.stage);
+  if (nextStage !== null && isStageUnlocked(nextStage)) {
     state.stage = nextStage;
     state.mode = firstIncompleteLane(nextStage) || laneOrder[0];
     renderQuestion();
@@ -358,12 +367,13 @@ function isLaneCleared(stageIndex, mode) {
 }
 
 function nextIncompleteLane(stageIndex, currentMode) {
-  const start = laneOrder.indexOf(currentMode) + 1;
-  return laneOrder.slice(start).find((mode) => !isLaneCleared(stageIndex, mode)) || null;
+  const lanesForRole = activeLaneOrder();
+  const start = lanesForRole.indexOf(currentMode) + 1;
+  return lanesForRole.slice(start).find((mode) => !isLaneCleared(stageIndex, mode)) || null;
 }
 
 function firstIncompleteLane(stageIndex) {
-  return laneOrder.find((mode) => !isLaneCleared(stageIndex, mode)) || null;
+  return activeLaneOrder().find((mode) => !isLaneCleared(stageIndex, mode)) || null;
 }
 
 function switchMode(event) {
@@ -379,6 +389,7 @@ function switchStage(event) {
   const button = event.target.closest(".campaign-button");
   if (!button) return;
   const nextStage = Number(button.dataset.stage);
+  if (!isStageVisible(nextStage)) return;
   if (!isStageUnlocked(nextStage)) {
     els.feedback.className = "feedback error";
     els.feedback.innerHTML = "<strong>Locked</strong><span>Clear 75% of the previous stage first.</span>";
@@ -407,6 +418,7 @@ function clearAutoNext() {
 
 function initAuth() {
   if (sessionStorage.getItem("qaArcadeAuth") === "yes") {
+    currentRole = sessionStorage.getItem("qaArcadeRole") || "visitor";
     unlockApp();
   }
 
@@ -415,10 +427,16 @@ function initAuth() {
     const username = els.usernameInput.value.trim();
     const password = els.passwordInput.value;
 
-    if (username === authCredentials.username && password === authCredentials.password) {
+    const account = authCredentials.find((item) => item.username === username && item.password === password);
+
+    if (account) {
       sessionStorage.setItem("qaArcadeAuth", "yes");
+      sessionStorage.setItem("qaArcadeRole", account.role);
+      currentRole = account.role;
       els.loginError.textContent = "";
       unlockApp();
+      normalizeVisitorState();
+      renderQuestion();
       return;
     }
 
@@ -429,6 +447,8 @@ function initAuth() {
 
   els.logout.addEventListener("click", () => {
     sessionStorage.removeItem("qaArcadeAuth");
+    sessionStorage.removeItem("qaArcadeRole");
+    currentRole = "visitor";
     document.body.classList.add("auth-locked");
     els.passwordInput.value = "";
     els.usernameInput.focus();
@@ -437,6 +457,78 @@ function initAuth() {
 
 function unlockApp() {
   document.body.classList.remove("auth-locked");
+}
+
+function activeLaneOrder() {
+  return currentRole === "visitor" ? laneOrder.filter((mode) => mode !== "scenarios") : laneOrder;
+}
+
+function isStageVisible(stageIndex) {
+  return currentRole !== "visitor" || stageIndex < 9;
+}
+
+function nextVisibleStage(stageIndex) {
+  for (let index = stageIndex + 1; index < stages.length; index += 1) {
+    if (isStageVisible(index)) return index;
+  }
+  return null;
+}
+
+function normalizeVisitorState() {
+  if (currentRole !== "visitor") return;
+  if (state.mode === "scenarios") state.mode = "methods";
+  if (!isStageVisible(state.stage)) {
+    state.stage = 0;
+    state.mode = "methods";
+  }
+}
+
+function displayStageTitle(title) {
+  if (currentRole !== "visitor") return title;
+  return title
+    .replace("Week 10: Resume Boss Level", "Week 10: Final Challenge")
+    .replace("Postman Project", "Postman Practice")
+    .replace("Pytest API Automation", "Pytest API Challenge");
+}
+
+function displayStageTheme(theme) {
+  if (currentRole !== "visitor") return theme;
+  return theme
+    .replace("Turn projects into resume bullets and interview stories.", "Review the learning journey and final challenge.")
+    .replace("Convert API scenarios into code tests.", "Practice turning API scenarios into code tests.")
+    .replace("Use AI agents to generate, refactor, and debug tests responsibly.", "Use AI tools to generate, refactor, and debug tests responsibly.");
+}
+
+function displayDailyPrompt(prompt) {
+  if (currentRole !== "visitor") return prompt;
+  return prompt
+    .replace("Create one Postman collection folder for login, users, and errors.", "Create one Postman collection folder for login, users, and error cases.")
+    .replace("Prepare a 5-minute explanation of your portfolio project.", "Prepare a short explanation of what you learned.");
+}
+
+function displayQuestion(question) {
+  if (currentRole !== "visitor") return question;
+  return {
+    ...question,
+    question: visitorText(question.question),
+    payload: visitorText(question.payload),
+    explanation: visitorText(question.explanation),
+    choices: question.choices.map(([label, detail]) => [visitorText(label), visitorText(detail)])
+  };
+}
+
+function visitorText(value) {
+  return String(value)
+    .replaceAll("resume-friendly", "useful for learning")
+    .replaceAll("resume", "learning notes")
+    .replaceAll("Resume", "Learning")
+    .replaceAll("career", "learning")
+    .replaceAll("Career", "Learning")
+    .replaceAll("portfolio", "practice")
+    .replaceAll("Portfolio", "Practice")
+    .replaceAll("interview", "review")
+    .replaceAll("Interview", "Review")
+    .replaceAll("next software tester role", "testing practice");
 }
 
 function escapeHtml(value) {
