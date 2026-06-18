@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QA Arcade: Automation Tester Campaign</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="site-nav">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <rect x="6" y="8" width="36" height="28" rx="5"></rect>
+              <path d="M14 20h20M14 27h12M17 40h14"></path>
+              <path d="M20 36v4M28 36v4"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="eyebrow" id="campaignLabel">Stage 1</p>
+            <h1>QA Arcade</h1>
+          </div>
+        </div>
+
+        <nav class="top-links" aria-label="Main navigation">
+          <a href="#campaign">Learn</a>
+          <a href="#mission">Practice</a>
+          <a href="#quest">Quest Log</a>
+        </nav>
+
+        <div class="player-card" aria-label="Player status">
+          <div class="hud-stat">
+            <span class="small-label">Level</span>
+            <strong id="levelValue">1</strong>
+          </div>
+          <div class="hud-stat">
+            <span class="small-label">XP</span>
+            <strong id="xpValue">0</strong>
+          </div>
+          <div class="hud-stat">
+            <span class="small-label">Streak</span>
+            <strong id="streakValue">0</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="hero" aria-label="Automation tester adventure">
+        <div class="hero-copy">
+          <p class="eyebrow">Start Your QA Adventure</p>
+          <h2>Explore the world of automation testing</h2>
+          <p>
+            Clear weekly stages, answer API and automation challenges, and turn each win into portfolio proof for your next software tester role.
+          </p>
+          <a class="hero-button" href="#mission">Start Mission</a>
+        </div>
+
+        <div class="pixel-world" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+          <div class="mountain m1"></div>
+          <div class="mountain m2"></div>
+          <div class="island"></div>
+          <div class="path-dot d1"></div>
+          <div class="path-dot d2"></div>
+          <div class="path-dot d3"></div>
+          <div class="tower-pixel"></div>
+        </div>
+      </section>
+
+      <section class="campaign-section" id="campaign" aria-label="Campaign stages">
+        <div class="section-heading">
+          <p class="eyebrow">Automation Tester Path</p>
+          <h2>Choose Your Stage</h2>
+        </div>
+        <div class="campaign-list" id="campaignList"></div>
+      </section>
+
+      <section class="game-board" id="mission" aria-label="QA Arcade automation tester mission">
+        <aside class="sidebar">
+          <p class="eyebrow">Challenge Lanes</p>
+          <nav class="mode-list" aria-label="Challenge lanes">
+            <button class="mode-button active" type="button" data-mode="methods">
+              <span class="mode-icon" aria-hidden="true">01</span>
+              <span>Concepts</span>
+            </button>
+            <button class="mode-button" type="button" data-mode="statuses">
+              <span class="mode-icon" aria-hidden="true">02</span>
+              <span>API Lab</span>
+            </button>
+            <button class="mode-button" type="button" data-mode="response">
+              <span class="mode-icon" aria-hidden="true">03</span>
+              <span>Automation</span>
+            </button>
+            <button class="mode-button" type="button" data-mode="scenarios">
+              <span class="mode-icon" aria-hidden="true">04</span>
+              <span>Career</span>
+            </button>
+          </nav>
+        </aside>
+
+        <section class="stage">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow" id="modeEyebrow">HTTP Methods</p>
+              <h2 id="modeTitle">Method Match</h2>
+            </div>
+            <div class="actions">
+              <button class="icon-button" type="button" id="resetButton" aria-label="Reset progress" title="Reset progress">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                  <path d="M3 4v6h6"></path>
+                </svg>
+              </button>
+              <button class="primary-button" type="button" id="nextButton">Next Gate</button>
+            </div>
+          </header>
+
+          <div class="mission-wrap">
+            <section class="mission-panel" aria-live="polite">
+              <div class="network-visual" aria-hidden="true">
+                <svg viewBox="0 0 720 230">
+                  <defs>
+                    <linearGradient id="packetGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#38bdf8"></stop>
+                      <stop offset="48%" stop-color="#22c55e"></stop>
+                      <stop offset="100%" stop-color="#f59e0b"></stop>
+                    </linearGradient>
+                  </defs>
+                  <path class="grid-line" d="M0 48h720M0 116h720M0 184h720M92 0v230M232 0v230M372 0v230M512 0v230M652 0v230"></path>
+                  <path class="wire" d="M74 142 C165 52 251 202 358 92 S549 34 646 138"></path>
+                  <path class="scan" d="M46 191h628"></path>
+                  <g class="tower t1">
+                    <path d="M52 160h56l-10 36H62z"></path>
+                    <rect x="63" y="117" width="34" height="46" rx="5"></rect>
+                    <path d="M69 129h22M69 140h22M69 151h22"></path>
+                  </g>
+                  <g class="tower t2">
+                    <path d="M318 153h80l-14 43h-52z"></path>
+                    <rect x="331" y="84" width="54" height="73" rx="7"></rect>
+                    <path d="M343 99h30M343 113h30M343 127h30M343 141h30"></path>
+                  </g>
+                  <g class="tower t3">
+                    <path d="M618 160h56l-10 36h-36z"></path>
+                    <rect x="629" y="116" width="34" height="47" rx="5"></rect>
+                    <path d="M635 130h22M635 143h22M635 156h22"></path>
+                  </g>
+                  <circle class="packet" cx="74" cy="142" r="10"></circle>
+                  <text x="80" y="214" text-anchor="middle">CLIENT</text>
+                  <text x="358" y="214" text-anchor="middle">API CORE</text>
+                  <text x="646" y="214" text-anchor="middle">DATA VAULT</text>
+                </svg>
+              </div>
+
+              <div class="question-block">
+                <p class="mission-type" id="missionType">Scenario</p>
+                <h3 id="questionText"></h3>
+                <pre class="payload" id="payloadBlock"></pre>
+              </div>
+
+              <div class="choices" id="choices"></div>
+
+              <div class="feedback" id="feedback">
+                <strong>Ready</strong>
+                <span>Pick an answer to start earning XP.</span>
+              </div>
+            </section>
+
+            <aside class="notes-panel" id="quest">
+              <h3>Stage Progress</h3>
+              <div class="skill-track" id="skillTrack"></div>
+              <div class="daily-card">
+                <span class="small-label">Quest</span>
+                <p id="dailyPrompt"></p>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="app.js?v=hide-hints-3"></script>
+  </body>
+</html>
