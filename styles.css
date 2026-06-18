@@ -50,6 +50,82 @@ body::before {
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 5px);
 }
 
+.auth-locked {
+  overflow: hidden;
+}
+
+.auth-locked .app-shell {
+  display: none;
+}
+
+.login-screen {
+  display: none;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-locked .login-screen {
+  display: grid;
+}
+
+.login-card {
+  width: min(420px, 100%);
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(12, 20, 49, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.login-brand {
+  margin-bottom: 20px;
+}
+
+.login-copy {
+  margin-bottom: 22px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.login-card label {
+  display: block;
+  margin: 14px 0 7px;
+  color: var(--yellow);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.login-card input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  background: rgba(7, 11, 29, 0.92);
+}
+
+.login-card input:focus {
+  border-color: var(--yellow);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.18);
+}
+
+.login-button {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.login-error {
+  min-height: 20px;
+  margin: 14px 0 0;
+  color: var(--red);
+  font-size: 0.92rem;
+}
+
 button,
 a {
   font: inherit;
@@ -141,6 +217,7 @@ h1 {
 
 .top-links {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 22px;
   color: var(--muted);
@@ -149,6 +226,20 @@ h1 {
 }
 
 .top-links a:hover {
+  color: var(--ink);
+}
+
+.nav-button {
+  padding: 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: transparent;
+}
+
+.nav-button:hover {
   color: var(--ink);
 }
 

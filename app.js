@@ -6,6 +6,10 @@ const lanes = {
 };
 
 const laneOrder = Object.keys(lanes);
+const authCredentials = {
+  username: "yvonne",
+  password: "Learning777"
+};
 
 const stages = [
   {
@@ -130,6 +134,11 @@ const els = {
   feedback: document.querySelector("#feedback"),
   next: document.querySelector("#nextButton"),
   reset: document.querySelector("#resetButton"),
+  logout: document.querySelector("#logoutButton"),
+  loginForm: document.querySelector("#loginForm"),
+  loginError: document.querySelector("#loginError"),
+  usernameInput: document.querySelector("#usernameInput"),
+  passwordInput: document.querySelector("#passwordInput"),
   skillTrack: document.querySelector("#skillTrack"),
   dailyPrompt: document.querySelector("#dailyPrompt"),
   modeButtons: document.querySelectorAll(".mode-button")
@@ -396,6 +405,40 @@ function clearAutoNext() {
   state.autoNextTimer = null;
 }
 
+function initAuth() {
+  if (sessionStorage.getItem("qaArcadeAuth") === "yes") {
+    unlockApp();
+  }
+
+  els.loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const username = els.usernameInput.value.trim();
+    const password = els.passwordInput.value;
+
+    if (username === authCredentials.username && password === authCredentials.password) {
+      sessionStorage.setItem("qaArcadeAuth", "yes");
+      els.loginError.textContent = "";
+      unlockApp();
+      return;
+    }
+
+    els.loginError.textContent = "Invalid username or password.";
+    els.passwordInput.value = "";
+    els.passwordInput.focus();
+  });
+
+  els.logout.addEventListener("click", () => {
+    sessionStorage.removeItem("qaArcadeAuth");
+    document.body.classList.add("auth-locked");
+    els.passwordInput.value = "";
+    els.usernameInput.focus();
+  });
+}
+
+function unlockApp() {
+  document.body.classList.remove("auth-locked");
+}
+
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
@@ -412,4 +455,5 @@ els.reset.addEventListener("click", resetProgress);
 els.campaignList.addEventListener("click", switchStage);
 els.modeButtons.forEach((button) => button.addEventListener("click", switchMode));
 
+initAuth();
 renderQuestion();

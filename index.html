@@ -6,7 +6,36 @@
     <title>QA Arcade: Automation Tester Campaign</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="auth-locked">
+    <section class="login-screen" id="loginScreen" aria-label="Login">
+      <form class="login-card" id="loginForm">
+        <div class="brand login-brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <rect x="6" y="8" width="36" height="28" rx="5"></rect>
+              <path d="M14 20h20M14 27h12M17 40h14"></path>
+              <path d="M20 36v4M28 36v4"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="eyebrow">Private Access</p>
+            <h1>QA Arcade</h1>
+          </div>
+        </div>
+
+        <p class="login-copy">Sign in to continue your automation tester campaign.</p>
+
+        <label for="usernameInput">Username</label>
+        <input id="usernameInput" name="username" type="text" autocomplete="username" autofocus />
+
+        <label for="passwordInput">Password</label>
+        <input id="passwordInput" name="password" type="password" autocomplete="current-password" />
+
+        <button class="primary-button login-button" type="submit">Login</button>
+        <p class="login-error" id="loginError" role="alert"></p>
+      </form>
+    </section>
+
     <main class="app-shell">
       <header class="site-nav">
         <div class="brand">
@@ -27,6 +56,7 @@
           <a href="#campaign">Learn</a>
           <a href="#mission">Practice</a>
           <a href="#quest">Quest Log</a>
+          <button class="nav-button" type="button" id="logoutButton">Logout</button>
         </nav>
 
         <div class="player-card" aria-label="Player status">
@@ -179,6 +209,6 @@
         </section>
       </section>
     </main>
-    <script src="app.js?v=hide-hints-3"></script>
+    <script src="app.js?v=login-gate-4"></script>
   </body>
 </html>
