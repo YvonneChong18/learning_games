@@ -7,7 +7,7 @@ const lanes = {
 
 const laneOrder = Object.keys(lanes);
 const authCredentials = [
-  { username: "yvonne", password: "Learning777", role: "owner", storageUser: "yvonne" },
+  { username: "yvonne", password: "123456evon", role: "owner", storageUser: "yvonne" },
   { username: "visitor", password: "visitor111", role: "visitor", storageUser: "visitor" }
 ];
 
@@ -355,7 +355,9 @@ function updateScoreboard() {
   els.xp.textContent = state.xp;
   els.streak.textContent = state.streak;
   els.level.textContent = Math.floor(state.xp / 120) + 1;
-  persist();
+  if (isAuthenticated()) {
+    persist();
+  }
 }
 
 function renderCampaign() {
@@ -571,27 +573,16 @@ function initAuth() {
     loadProgress();
     applyRoleClass();
     unlockApp();
+    renderQuestion();
+    return;
   }
+
+  applyRoleClass();
+  updateScoreboard();
 
   els.loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const username = els.usernameInput.value.trim();
-    const password = els.passwordInput.value;
-
-    const account = authCredentials.find((item) => item.username === username && item.password === password);
-
-    if (account) {
-      sessionStorage.setItem("qaArcadeAuth", "yes");
-      sessionStorage.setItem("qaArcadeRole", account.role);
-      sessionStorage.setItem("qaArcadeUser", account.storageUser);
-      currentRole = account.role;
-      currentUser = account.storageUser;
-      loadProgress();
-      applyRoleClass();
-      els.loginError.textContent = "";
-      unlockApp();
-      normalizeVisitorState();
-      renderQuestion();
+    if (loginWithCredentials(els.usernameInput.value.trim(), els.passwordInput.value)) {
       return;
     }
 
@@ -606,17 +597,54 @@ function initAuth() {
     sessionStorage.removeItem("qaArcadeUser");
     currentRole = "visitor";
     currentUser = "visitor";
-    loadProgress();
+    Object.assign(state, defaultProgress());
     applyRoleClass();
     document.body.classList.add("auth-locked");
     els.passwordInput.value = "";
     els.usernameInput.focus();
   });
+
+  loginFromQueryParams();
+}
+
+function loginWithCredentials(username, password) {
+  const account = authCredentials.find((item) => item.username === username && item.password === password);
+  if (!account) return false;
+
+  sessionStorage.setItem("qaArcadeAuth", "yes");
+  sessionStorage.setItem("qaArcadeRole", account.role);
+  sessionStorage.setItem("qaArcadeUser", account.storageUser);
+  currentRole = account.role;
+  currentUser = account.storageUser;
+  loadProgress();
+  applyRoleClass();
+  els.loginError.textContent = "";
+  unlockApp();
+  normalizeVisitorState();
+  renderQuestion();
+  return true;
+}
+
+function loginFromQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  const username = params.get("username");
+  const password = params.get("password");
+  if (!username || !password) return;
+
+  els.usernameInput.value = username;
+  els.passwordInput.value = password;
+  if (!loginWithCredentials(username, password)) {
+    els.loginError.textContent = "Invalid username or password.";
+  }
 }
 
 function unlockApp() {
   applyRoleClass();
   document.body.classList.remove("auth-locked");
+}
+
+function isAuthenticated() {
+  return sessionStorage.getItem("qaArcadeAuth") === "yes";
 }
 
 function applyRoleClass() {
@@ -713,4 +741,3 @@ els.campaignList.addEventListener("click", switchStage);
 els.modeButtons.forEach((button) => button.addEventListener("click", switchMode));
 
 initAuth();
-renderQuestion();
